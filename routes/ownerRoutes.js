@@ -45,7 +45,7 @@ router.put("/owners/:id", async (req, res) => {
 router.get("/owners", async (req, res) => {
 
     try {
-        console.log("get-owners-request: ", req);
+        console.log("get-all-owners-request: ");
         const owners = await fetchAllOwners();
         if (owners) {
             res.status(200).json({

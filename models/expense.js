@@ -11,8 +11,8 @@ const expenseSchema = new mongoose.Schema({
   ],
   date: { type: Date, default: Date.now },
   totalMonthExpenses: { type: Number, required: true },
-  totalSavingsAmount: { type: Number, required: false },
-  netBalanceAmount: { type: Number, required: false }
+  previousMonthCorpusFund: { type: Number, required: false }, //new field
+  currentMonthCorpusFund: { type: Number, required: false } // new field
 
 });
 

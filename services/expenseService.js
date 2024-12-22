@@ -1,26 +1,30 @@
-const ExpensesModel = require("../models/expense");
+const ExpensesModel = require("../models/ExpensesModel");
 
-async function saveOrUpdateExpenses(expenseObj) {
-    const monthYear = expenseObj.monthYear ? expenseObj.monthYear : getCurrentMonthYear();
-    console.log("monthYear: " + monthYear); // Outputs: "11-2024"
-
+async function saveOrUpdateExpenses(expenseModel) {
     try {
-        // Use findByIdAndUpdate to update or create the document
-        const expenseDoc = await ExpensesModel.findByIdAndUpdate(
-            monthYear, // _id to search for (currentMonthYear)
+        console.log("Expenses is about to be saved:", expenseModel);
+        const savedExpenses = await ExpensesModel.findByIdAndUpdate(
+            expenseModel.monthYear,
             {
-                monthlyExpenses: expenseObj.monthlyExpenses,
-                totalMonthExpenses: expenseObj.totalMonthExpenses,
-                previousMonthCorpusFund: expenseObj.previousMonthCorpusFund,
-                currentMonthCorpusFund: expenseObj.currentMonthCorpusFund,
-            },
-            { new: true, upsert: true } // `new: true` returns the updated doc, `upsert: true` creates the doc if not found
-        );
+                monthlyExpenses: expenseModel.monthlyExpenses,
+                totalMonthExpenseAmount: expenseModel.totalMonthExpenseAmount,
+                currentCorpusFund: expenseModel.currentCorpusFund,
+                previousCorpusFund: expenseModel.previousCorpusFund
 
-        console.log(`Expenses for ${monthYear} have been saved/updated with expenseDoc:`, expenseDoc);
-        return expenseDoc; // Return the updated document if needed
+            },
+            {
+                new: true, // Return the updated document
+                upsert: true, // Insert if not found
+            }
+        );
+        if (!savedExpenses) {
+            throw new Error("Failed to save or update expenses.");
+        }
+        console.log("Expenses saved successfully:", savedExpenses);
+        return savedExpenses;
+
     } catch (error) {
-        console.error("Error saving or updating expenses:", error.message);
+        console.error("Error saving expenses:", error.message);
     }
 }
 

@@ -38,7 +38,7 @@ let fetchAllOwners = async () => {
     try {
         // Fetch all owners from the database
         const owners = await OwnerModel.find().sort({ flatNo: 1 }); // Sort by `flatNo` in ascending order
-        console.log("Owners fetched successfully:", owners);
+        console.log("Owners fetched successfully:");
         return owners;
     } catch (error) {
         console.error("Error while fetching owners:", error);

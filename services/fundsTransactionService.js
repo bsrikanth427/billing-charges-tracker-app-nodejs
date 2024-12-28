@@ -19,7 +19,7 @@ async function updateFundsTransactionsByExpenseId(fundModel) {
         console.log("Attempting to update funds transaction with expense ID:", fundModel.expenseId);
 
         const updatedFunds = await FundsTransactionsModel.findOneAndUpdate(
-            { expenseId: fundModel.expenseId }, // Match by expenseId
+            { expenseId: fundModel.expenseId, type: fundModel.type }, // Match by expenseId and type
             { $set: fundModel }, // Update fields
             {
                 new: true, // Return the updated document

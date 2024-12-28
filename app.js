@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const expenseRoutes = require("./routes/expenseRoutes");
 const ownerRoutes = require("./routes/ownerRoutes");
 const fundsRoutes = require("./routes/fundsRoutes");
+const maintainanceRoutes = require("./routes/maintainanceRoutes");
+
 
 
 const app = express();
@@ -26,6 +28,7 @@ app.use((req, res, next) => {
 app.use("/api", expenseRoutes);
 app.use("/api", ownerRoutes);
 app.use("/api", fundsRoutes);
+app.use("/api", maintainanceRoutes);
 
 
 // MongoDB Connection

@@ -1,9 +1,9 @@
 // routes/expenseRoute.js
 const express = require("express");
 const router = express.Router();
-const { saveOrUpdateExpenses, fetchExpensesByMonthYear, deleteExpenseByMonthYear } = require("../services/expenseService");  // Import the function
+const { saveOrUpdateExpenses, fetchExpensesByMonthYear, deleteExpenseByMonthYear, deleteAllExpenses } = require("../services/expenseService");  // Import the function
 const { saveFundsTransactions, updateFundsTransactionsByExpenseId, getOutstandingBalance } = require("../services/fundsTransactionService");
-
+const { saveMonthlyMaintananceForFlat, fetchMonthMaintainanceByMonthYear, calculateMonthlyMaintananceForFlat } = require("../services/maintainanceService");
 // POST route to save or update expenses
 router.post("/expenses", async (req, res) => {
   try {
@@ -27,9 +27,13 @@ router.post("/expenses", async (req, res) => {
     if (!savedExpense) {
       throw new Error("Error saving expenses: ", JSON.stringify(expenseModel));
     }
+    const savedMonthMaintainances = await calculateMonthlyMaintananceForFlat(expenseModel);
+    if (!savedMonthMaintainances) {
+      throw new Error("Error saving MonthlyMaintananceForFlat: ", JSON.stringify(expenseModel));
+    }
     res.status(200).json({
       message: `Expenses have been saved/updated successfully`,
-      data: { savedExpense, updatedFunds },
+      data: { savedExpense, updatedFunds, savedMonthMaintainances },
     });
 
   } catch (error) {
@@ -110,6 +114,19 @@ router.delete("/expenses/:monthYear", async (req, res) => {
 });
 
 
+router.delete("/expenses", async (req, res) => {
+  try {
+    console.log("delete-all-expenses request");
+    const result = await deleteAllExpenses(); // Assume this function exists
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error("Error deleting expenses:", error);
+    res.status(500).json({ message: "Internal server error", data: error.message });
+  }
+
+});
+
+
 
 function extractExpenses(req) {
   // Destructure and validate inputs from req.body
@@ -142,8 +159,7 @@ const corpusFundModel = (expenseModel) => {
     name: "MonthlyMaintainance",
     amount: expenseModel.totalMonthExpenseAmount,
     type: "DEBIT",
-    description: "MonthlyMaintainance",
-    //outstandingBalance: expenseModel.currentCorpusFund,
+    description: "DebitingMonthlyMaintainanceFor  " + expenseModel.monthYear,
     expenseId: expenseModel.monthYear
   };
 };

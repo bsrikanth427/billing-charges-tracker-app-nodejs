@@ -58,10 +58,24 @@ let deleteExpenseByMonthYear = async (monthYear) => {
     }
 };
 
+let deleteAllExpenses = async () => {
+    console.log("Inside expensesService's deleteAllExpenses: ");
+    try {
+        const response = await ExpensesModel.deleteMany({});
+        console.log("All Expenses deleted successfully:", response);
+        return { statusCode: 200, message: `Expenses ${response.deletedCount} deleted successfully` };
+    } catch (error) {
+        console.error("Error deleting Expenses:", error);
+        return { statusCode: 500, message: `Failed to delete Expenses  due to  ${error.message}` };
+
+    }
+}
+
+
 
 function getCurrentMonthYear() {
     const currentDate = new Date();
     return `${String(currentDate.getMonth() + 1).padStart(2, '0')}-${currentDate.getFullYear()}`;
 }
 
-module.exports = { saveOrUpdateExpenses, fetchExpensesByMonthYear, deleteExpenseByMonthYear };
+module.exports = { saveOrUpdateExpenses, fetchExpensesByMonthYear, deleteExpenseByMonthYear, deleteAllExpenses };

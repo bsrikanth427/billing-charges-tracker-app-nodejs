@@ -1,5 +1,6 @@
 // models/expense.js
 const mongoose = require("mongoose");
+const { getOutstandingBalance } = require("../services/fundsTransactionService");
 
 const fundsTransactionsSchema = new mongoose.Schema(
     {
@@ -12,7 +13,8 @@ const fundsTransactionsSchema = new mongoose.Schema(
         updatedDate: { type: Date, default: Date.now },
         updatedBy: { type: String, required: false },
         monthYear: { type: String, required: false },
-        expenseId: { type: String, required: false }
+        expenseId: { type: String, required: false },
+        outstandingBalance: { type: Number, required: false }
 
     }
 

@@ -4,7 +4,9 @@ const FundsTransactionsModel = require("../models/fundsTransactions");
 async function saveFundsTransactions(fundModel) {
     console.log("Inside fundsTransaction's saveFundsTransactions", fundModel);
     try {
-        const newFunds = new FundsTransactionsModel(fundModel);
+
+        const updatedFundModel = await updateOutstandingBalance(fundModel);
+        const newFunds = new FundsTransactionsModel(updatedFundModel);
         const savedFunds = await newFunds.save();
         console.log("Funds saved successfully:", savedFunds);
         return savedFunds;
@@ -17,10 +19,10 @@ async function saveFundsTransactions(fundModel) {
 async function updateFundsTransactionsByExpenseId(fundModel) {
     try {
         console.log("Attempting to update funds transaction with expense ID:", fundModel.expenseId);
-
+        const updatedFundModel = await updateOutstandingBalance(fundModel);
         const updatedFunds = await FundsTransactionsModel.findOneAndUpdate(
-            { expenseId: fundModel.expenseId, type: fundModel.type }, // Match by expenseId and type
-            { $set: fundModel }, // Update fields
+            { expenseId: updatedFundModel.expenseId, type: updatedFundModel.type }, // Match by expenseId and type
+            { $set: updatedFundModel }, // Update fields
             {
                 new: true, // Return the updated document
                 upsert: true, // Insert if not found
@@ -43,6 +45,22 @@ async function updateFundsTransactionsByExpenseId(fundModel) {
     }
 }
 
+async function updateOutstandingBalance(fundModel) {
+    try {
+        const outstandingBalance = await getOutstandingBalance();
+        const currentOutstandingBalance = Number(outstandingBalance);
+        const fundAmount = Number(fundModel.amount);
+        if (fundModel.type === "CREDIT") {
+            fundModel.outstandingBalance = currentOutstandingBalance + fundAmount;
+        } else if (fundModel.type === "DEBIT") {
+            fundModel.outstandingBalance = currentOutstandingBalance - fundAmount;
+        }
+        return fundModel;
+    } catch (error) {
+        console.error("Error updating outstanding balance:", error);
+        throw error;
+    }
+}
 
 
 
@@ -53,22 +71,6 @@ let fetchAllFunds = async () => {
         const funds = await FundsTransactionsModel.find().sort({ createdDate: -1 });
         console.log("Funds fetched successfully:");
         return funds;
-    } catch (error) {
-        console.error("Error while fetching funds:", error);
-        throw new Error(`Failed to fetch funds: ${error.message}`);
-    }
-};
-
-let getOutstandingBalance2 = async () => {
-    console.log("Inside fundsTransaction's getOutstandingBalance");
-    try {
-        const fund = await FundsTransactionsModel.find().sort({ createdDate: -1 }); // Sort in descending order
-        console.log("funds: ", fund);
-        if (fund) {
-            return fund.outstandingBalance;
-        } else {
-            return 0;
-        }
     } catch (error) {
         console.error("Error while fetching funds:", error);
         throw new Error(`Failed to fetch funds: ${error.message}`);

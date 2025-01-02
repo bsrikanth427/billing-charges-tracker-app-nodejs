@@ -25,6 +25,8 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
 // Routes
 app.use("/api", expenseRoutes);
 app.use("/api", ownerRoutes);

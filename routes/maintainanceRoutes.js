@@ -60,6 +60,7 @@ const corpusFundModel = (reqBody) => {
   return {
     name: "MonthlyMaintainance",
     amount: reqBody.monthMaintainanceAmountReceived,
+    maintainancePerFlat: reqBody.maintainancePerFlat,
     type: "CREDIT",
     description: "CreditingMonthlyMaintainanceFor  " + reqBody.monthYear,
     expenseId: reqBody.monthYear

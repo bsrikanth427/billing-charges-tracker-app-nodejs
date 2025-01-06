@@ -5,7 +5,7 @@ async function saveFundsTransactions(fundModel) {
     console.log("Inside fundsTransaction's saveFundsTransactions", fundModel);
     try {
 
-        const updatedFundModel = await updateOutstandingBalance(fundModel);
+        const updatedFundModel = await updateOutstandingBalance(fundModel, null);
         const newFunds = new FundsTransactionsModel(updatedFundModel);
         const savedFunds = await newFunds.save();
         console.log("Funds saved successfully:", savedFunds);
@@ -19,7 +19,7 @@ async function saveFundsTransactions(fundModel) {
 async function updateFundsTransactionsByExpenseId(fundModel) {
     try {
         console.log("Attempting to update funds transaction with expense ID:", fundModel.expenseId);
-        const updatedFundModel = await updateOutstandingBalance(fundModel);
+        const updatedFundModel = await updateOutstandingBalance(fundModel, fundModel.maintainancePerFlat);
         const updatedFunds = await FundsTransactionsModel.findOneAndUpdate(
             { expenseId: updatedFundModel.expenseId, type: updatedFundModel.type }, // Match by expenseId and type
             { $set: updatedFundModel }, // Update fields
@@ -45,11 +45,12 @@ async function updateFundsTransactionsByExpenseId(fundModel) {
     }
 }
 
-async function updateOutstandingBalance(fundModel) {
+
+async function updateOutstandingBalance(fundModel, maintainancePerFlat) {
     try {
         const outstandingBalance = await getOutstandingBalance();
         const currentOutstandingBalance = Number(outstandingBalance);
-        const fundAmount = Number(fundModel.amount);
+        const fundAmount = (maintainancePerFlat) ? maintainancePerFlat : fundModel.amount;
         if (fundModel.type === "CREDIT") {
             fundModel.outstandingBalance = currentOutstandingBalance + fundAmount;
         } else if (fundModel.type === "DEBIT") {

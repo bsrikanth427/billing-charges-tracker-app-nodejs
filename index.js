@@ -5,6 +5,8 @@ const expenseRoutes = require("./routes/expenseRoutes");
 const ownerRoutes = require("./routes/ownerRoutes");
 const fundsRoutes = require("./routes/fundsRoutes");
 const maintainanceRoutes = require("./routes/maintainanceRoutes");
+const userRoutes = require("./routes/userRoutes");
+const loginRoutes = require("./routes/loginRoutes");
 
 
 
@@ -36,6 +38,8 @@ app.use("/api", expenseRoutes);
 app.use("/api", ownerRoutes);
 app.use("/api", fundsRoutes);
 app.use("/api", maintainanceRoutes);
+app.use("/api", userRoutes);
+app.use("/api", loginRoutes);
 
 
 // MongoDB Connection
